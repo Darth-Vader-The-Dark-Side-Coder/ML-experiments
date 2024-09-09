@@ -1,0 +1,45 @@
+---
+title: "Lab_5"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:5
+
+Date:22/2/2021
+
+Dataset: Cleaned_data
+
+Task: I) For the given dataset design binary classifiers that can predict the severity level of Covid-19. Demonstrate how resampling methods can improve the estimation of the model performance.
+
+II) For the given  dataset design binary classifiers that can predict the difficulty in breathing for Covid-19 cases. Demonstrate how model selection and regularisation techniques can be employed to improve the model accuracy.
+
+```{r error=TRUE}
+library(tidyverse)  
+library(boot)  
+Auto=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/Cleaned-Data.csv")
+names(Cleaned_Data)
+ggplot(Cleaned_Data, aes(Severity_Severe,Severity_None)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 1), se = FALSE, linetype = 1) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, linetype = 2) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 3), se = FALSE, linetype = 3)
+set.seed(1)
+sample <- sample(c(TRUE, FALSE), nrow(Cleaned_Data), replace = T, prob = c(0.6,0.4))
+train <- Cleaned_Data[sample, ]
+test <- Cleaned_Data[!sample, ]
+
+
+
+
+
+
+```
+

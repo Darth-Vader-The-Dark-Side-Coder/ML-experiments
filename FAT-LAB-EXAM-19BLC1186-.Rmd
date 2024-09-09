@@ -1,0 +1,82 @@
+---
+title: "FAT LAB EXAM"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Date:7/6/2021
+
+Dataset:SeoulBikeData(d5)
+
+Question(Q_id-6):Develop a Random Forest Regression Tree for the givendataset. 
+Identify the target variable and describe the goal of the analysis. 
+Summarize the performance of the model. 
+Highlight the steps taken to improve model performance.
+
+```{r }
+#Importing the Given dataset and analysing it
+sbd <- read.csv("/Users/tarunsidhu/Downloads/SeoulBikeData.csv")
+dim(sbd)
+head(sbd)
+sapply(sbd, class)
+summary(sbd)
+
+# Fitting Regression Trees
+library(tree)
+library(ISLR)
+library(MASS)
+set.seed(1)
+train = sample(1:nrow(sbd), nrow(sbd)/2)
+tree.sbd=tree(Hour~.,sbd,subset=train)
+summary(tree.sbd)
+plot(tree.sbd)
+text(tree.sbd,pretty=0)
+cv.sbd=cv.tree(tree.sbd)
+plot(cv.sbd$size,cv.sbd$dev,type='b')
+prune.sbd=prune.tree(tree.sbd,best=5)
+plot(prune.sbd)
+text(prune.sbd,pretty=0)
+yhat=predict(tree.sbd,newdata=sbd[-train,])
+sbd.test=sbd[-train,"Hour"]
+plot(yhat,sbd.test)
+abline(0,1)
+mean((yhat-sbd.test)^2)
+
+# Bagging and Random Forests
+library(randomForest)
+set.seed(1)
+bag.sbd=randomForest(Hour~.,data=sbd,subset=train,mtry=13,importance=TRUE)
+bag.sbd
+yhat.bag = predict(bag.sbd,newdata=sbd[-train,])
+plot(yhat.bag, sbd.test)
+abline(0,1)
+mean((yhat.bag-sbd.test)^2)
+bag.sbd=randomForest(Hour~.,data=sbd,subset=train,mtry=13,ntree=25)
+yhat.bag = predict(bag.sbd,newdata=sbd[-train,])
+mean((yhat.bag-sbd.test)^2)
+set.seed(1)
+rf.sbd=randomForest(Hour~.,data=sbd,subset=train,mtry=6,importance=TRUE)
+yhat.rf = predict(rf.sbd,newdata=sbd[-train,])
+mean((yhat.rf-sbd.test)^2)
+importance(rf.sbd)
+varImpPlot(rf.sbd)
+
+oob.err=double(13)
+test.err=double(13)
+for (mtry in 1:13){
+  fit=randomForest(Hour~.,data = sbd,subset=train,mtry=mtry,ntree=400)
+  oob.err[mtry]=fit$mse[400]
+  pred=predict(fit,sbd[-train,])
+  test.err[mtry]=with(sbd[-train,],mean((Hour-Rented.Bike.Count)^2))
+  cat(mtry," ")                    
+}
+matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type = "b",ylab="Mean Squared Error")
+legend("topright",legend=c("00b","Test"),pch=19,col=c("red","blue"))
+```
+

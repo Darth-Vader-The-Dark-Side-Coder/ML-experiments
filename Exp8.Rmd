@@ -1,0 +1,78 @@
+---
+title: "Ex8 - SVM vs Logistic Regression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:9
+
+Date:12/4/2021
+
+Dataset:Cleaned.Data
+
+Task:Compare the performance of the best SVM model from Ex7 with the performance of a Logistic Regression model for the same task. Present the performance metrics and ROC curves. 
+
+```{r error=TRUE}
+#Logistic Regression for Cleaned.Data
+library(tidyverse)
+library(caret)
+Cleaned.Data=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/Cleaned-Data.csv")
+Cleaned.Data <- na.omit(Cleaned.Data)
+sample_n(Cleaned.Data, 3)
+set.seed(123)
+training.samples <- Cleaned.Data$Severity_Mild %>% 
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- Cleaned.Data[training.samples, ]
+test.data <- Cleaned.Data[-training.samples, ]
+model <- glm( Severity_Mild ~., data = train.data, family = binomial)
+summary(model)
+probabilities <- model %>% predict(test.data, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+mean(predicted.classes == test.data$Severity_Mild)
+model <- glm( Severity_Mild ~ Fever, data = train.data, family = binomial)
+summary(model)$coef
+newdata <- data.frame(Fever = c(20,  180))
+probabilities <- model %>% predict(newdata, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+predicted.classes
+train.data %>%
+  mutate(prob = ifelse(Severity_Mild == "pos", 1, 0)) %>%
+  ggplot(aes(Fever, prob)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+  labs(
+    title = "Logistic Regression Model", 
+    x = "Fever",
+    y = "Severity_Mild "
+  )
+
+model <- glm( Severity_Mild ~ Fever+Sore.Throat, 
+              data = train.data, family = binomial)
+summary(model)$coef
+model <- glm( Severity_Mild ~., data = train.data, family = binomial)
+summary(model)$coef
+coef(model)
+summary(model )$coef
+
+#SVM for Cleaned.Data
+Cleaned.Data=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/Cleaned-Data.csv")
+summary(Cleaned.Data)
+Cleaned_Data_1 <- Cleaned.Data[1:10000,]
+attach(Cleaned_Data_1)
+plot(Fever,Sore.Throat)
+library(e1071)
+svm.fit <- svm(Severity_Mild ~ Fever+Sore.Throat, data = Cleaned_Data_1, type='C-classification', kernel='linear', cost=10, scale=FALSE)
+plot(svm.fit, Cleaned_Data_1)
+summary(svm.fit)
+yhat <- predict(svm.fit, Cleaned_Data_1)
+table(predict=yhat, truth=Severity_Mild)
+library(caret)
+confusionMatrix(yhat, as.factor(Cleaned_Data_1$Severity_Mild))
+```
+

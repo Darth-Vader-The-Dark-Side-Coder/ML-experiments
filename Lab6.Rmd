@@ -1,0 +1,45 @@
+---
+title: "Lab6"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:6
+
+Date:22/3/2021
+
+Dataset:covid_19_data
+
+```{r error=TRUE}
+library(ISLR)
+covid=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/covid_19_data.csv")
+names(covid)
+set.seed(1)
+train=sample(392,196)
+lm.fit=lm(SNo~Deaths,data=covid,subset=train)
+attach(covid)
+mean((SNo-predict(lm.fit,covid))[-train]^2)
+lm.fit2=lm(SNo~poly(Deaths,2),data=covid,subset=train)
+mean((SNo-predict(lm.fit2,covid))[-train]^2)
+lm.fit3=lm(SNo~poly(Deaths,3),data=covid,subset=train)
+mean((SNo-predict(lm.fit3,covid))[-train]^2)
+set.seed(2)
+train=sample(392,196)
+lm.fit=lm(SNo~Deaths,subset=train)
+mean((SNo-predict(lm.fit,covid))[-train]^2)
+lm.fit2=lm(SNo~poly(Deaths,2),data=covid,subset=train)
+mean((SNo-predict(lm.fit2,covid))[-train]^2)
+lm.fit3=lm(SNo~poly(Deaths,3),data=covid,subset=train)
+mean((SNo-predict(lm.fit3,covid))[-train]^2)
+glm.fit=glm(SNo~Deaths,data=covid)
+coef(glm.fit)
+lm.fit=lm(SNo~Deaths,data=covid)
+coef(lm.fit)
+```
+

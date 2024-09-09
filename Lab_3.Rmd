@@ -1,0 +1,47 @@
+---
+title: "Lab_3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:3
+
+Date:22/2/2021
+
+Dataset: Cleaned_Data
+
+Task: to use Logistic regression for binary classification 
+
+
+```{r cars}
+library(ISLR)
+dataset <- read.csv("/Users/tarunsidhu/Downloads/Cleaned-Data.csv", header=TRUE)
+dataset = dataset[, 1:20]
+
+library(caTools)
+set.seed(123)
+
+split <- sample.split(dataset$Severity_Mild, SplitRatio= 0.8)
+
+training_set = subset(dataset, split=TRUE)
+test_set = subset(dataset , split=FALSE)
+
+classifier = glm(formula = Severity_Mild ~ ., 
+                 family = binomial,
+                 data = training_set)
+
+summary(classifier)
+
+prob_pred = predict(classifier, type= 'response')
+
+table(dataset$Severity_Mild, prob_pred > 0.5)
+
+```
+

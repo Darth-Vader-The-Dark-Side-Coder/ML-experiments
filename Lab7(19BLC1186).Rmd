@@ -1,0 +1,37 @@
+---
+title: "Lab_7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:7
+
+Date:3/4/2021
+
+Dataset: Cleaned-data
+Design a Support Vector Machine (for the given Dataset) - Binary Classifier using Linear and Radial Kernel and Cross validation to determine optimized values for the hyper-parameters of the model.
+
+The task is to develop a binary classifier to predict each of the severity levels of i) mild  ii) moderate  iii) severe 
+```{r error=TRUE}
+Cleaned.Data=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/Cleaned-Data.csv")
+summary(Cleaned.Data)
+Cleaned_Data_1 <- Cleaned.Data[1:10000,]
+attach(Cleaned_Data_1)
+plot(Fever,Sore.Throat)
+library(e1071)
+svm.fit <- svm(Severity_Mild ~ Fever+Sore.Throat, data = Cleaned_Data_1, type='C-classification', kernel='linear', cost=10, scale=FALSE)
+plot(svm.fit, Cleaned_Data_1)
+summary(svm.fit)
+yhat <- predict(svm.fit, Cleaned_Data_1)
+table(predict=yhat, truth=Severity_Mild)
+library(caret)
+confusionMatrix(yhat, as.factor(Cleaned_Data_1$Severity_Mild))
+
+```
+

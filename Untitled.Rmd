@@ -1,0 +1,45 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(tidyverse)  
+library(boot)  
+Auto=read.csv("/Users/tarunsidhu/Desktop/Sem 4/ML/ML(Lab)/Data Sets/Cleaned-Data.csv")
+names(Cleaned_Data)
+ggplot(Cleaned_Data, aes(Severity_Severe,Severity_None)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 1), se = FALSE, linetype = 1) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, linetype = 2) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 3), se = FALSE, linetype = 3)
+set.seed(1)
+sample <- sample(c(TRUE, FALSE), nrow(Cleaned_Data), replace = T, prob = c(0.6,0.4))
+train <- Cleaned_Data[sample, ]
+test <- Cleaned_Data[!sample, ]
+
+# loop for first ten polynomial
+mse.df <- tibble(degree = 1:10, mse = NA)
+
+for(i in 1:10) {
+  lm.fit <- lm(Severity_None ~ poly(Severity_Severe, i), data = train)
+  mse.df[i, 2] <- mean((test$Severity_None - predict(lm.fit, test))^2)
+}
+
+ggplot(mse.df, aes(degree, mse)) +
+  geom_line() +
+  geom_point() )
+
+```
+

@@ -1,0 +1,76 @@
+---
+title: "Ex9 - Random Forest Classifier"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Register Number:19BLC1186
+
+Name:Tarun Sidhu
+
+Lab Exercise No:9
+
+Date:26/4/2021
+
+Dataset: Wage
+
+Task:Perform a Random Forest Classification and put a for loop as shown in the given video
+
+```{r error=TRUE}
+# Fitting Regression Trees
+library(tree)
+library(ISLR)
+library(MASS)
+set.seed(1)
+train = sample(1:nrow(Wage), nrow(Wage)/2)
+tree.Wage=tree(education~.,Wage,subset=train)
+summary(tree.Wage)
+plot(tree.Wage)
+text(tree.Wage,pretty=0)
+cv.Wage=cv.tree(tree.Wage)
+plot(cv.Wage$size,cv.Wage$dev,type='b')
+prune.Wage=prune.tree(tree.Wage,best=5)
+plot(prune.Wage)
+text(prune.Wage,pretty=0)
+yhat=predict(tree.Wage,newdata=Wage[-train,])
+Wage.test=Wage[-train,"Education"]
+plot(yhat,Wage.test)
+abline(0,1)
+mean((yhat-Wage.test)^2)
+
+# Bagging and Random Forests
+
+library(randomForest)
+set.seed(1)
+bag.Wage=randomForest(education~.,data=Wage,subset=train,mtry=13,importance=TRUE)
+bag.Wage
+yhat.bag = predict(bag.Wage,newdata=Wage[-train,])
+plot(yhat.bag, Wage.test)
+abline(0,1)
+mean((yhat.bag-Wage.test)^2)
+bag.Wage=randomForest(education~.,data=Wage,subset=train,mtry=13,ntree=25)
+yhat.bag = predict(bag.Wage,newdata=Wage[-train,])
+mean((yhat.bag-Wage.test)^2)
+set.seed(1)
+rf.Wage=randomForest(education~.,data=Wage,subset=train,mtry=6,importance=TRUE)
+yhat.rf = predict(rf.Wage,newdata=Wage[-train,])
+mean((yhat.rf-Wage.test)^2)
+importance(rf.Wage)
+varImpPlot(rf.Wage)
+
+oob.err=double(13)
+test.err=double(13)
+for (mtry in 1:13){
+  fit=randomForest(education~.,data = Wage,subset=train,mtry=mtry,ntree=400)
+  oob.err[mtry]=fit$mse[400]
+  pred=predict(fit,Wage[-train,])
+  test.err[mtry]=with(Wage[-train,],mean((education-age)^2))
+  cat(mtry," ")                    
+}
+matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type = "b",ylab="Mean Squared Error")
+legend("topright",legend=c("00b","Test"),pch=19,col=c("red","blue"))
+
+
+```
